@@ -64,7 +64,7 @@ document.addEventListener('DOMContentLoaded',function(){
     // 5. Add new item
     function addNewItem(){
         // Get value from input
-        const text = itemInput.ariaValueMax.trim();
+        const text = itemInput.value.trim();
 
         // Check if input is empty
         if (text === ''){
