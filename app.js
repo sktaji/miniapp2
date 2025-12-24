@@ -75,7 +75,7 @@ document.addEventListener('DOMContentLoaded',function(){
         // Create new item object
         const newItem = {
             text: text,
-            date: new Date().toLocaleString();
+            date: new Date().toLocaleString(),
             id: Date.now() //Unique ID
         };
 
