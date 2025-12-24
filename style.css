@@ -15,7 +15,7 @@ body {
 
 /* Main container */
 .container {
-    position: left;
+    position: center;
     max-width: auto;
     margin: 0 auto;
     background: white;
@@ -33,6 +33,7 @@ h1{
 
 /* Input area */
 .input-area {
+    position: center;
     flex-direction: column;
     gap: 10px;
     margin-bottom: 30px;
