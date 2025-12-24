@@ -1,46 +1,66 @@
-// Waite for page to fully load
-document.addEventListener('DOMContentLoaded',function(){
+// Wait for page to fully load
+document.addEventListener('DOMContentLoaded', function () {
     // 1. Get Elements
     const itemInput = document.getElementById('itemInput');
     const addButton = document.getElementById('addButton');
     const itemList = document.getElementById('itemList');
 
+    // Safety: make sure elements exist
+    if (!itemInput || !addButton || !itemList) {
+        console.error('Missing required elements. Make sure the page has elements with ids: itemInput, addButton, itemList');
+        return;
+    }
+
     // 2. Load saved data
     let items = [];
-
-        // Try to load from localStorage
+    try {
         const savedItems = localStorage.getItem('myItems');
-        if (savedItems){
+        if (savedItems) {
             items = JSON.parse(savedItems);
             console.log('Loaded items:', items);
         }
-    
+    } catch (err) {
+        console.error('Failed to load saved items:', err);
+    }
+
     // 3. Display function
-    function displayItems(){
+    function displayItems() {
         // Clear current list
-        itemList.innerHTML='';
+        itemList.innerHTML = '';
 
         // Check if empty
-        if (items.length === 0){
-            itemList.innerHTML = '<li style="color:#888, text-align: center;">No items yet. Add something!</li>';
+        if (items.length === 0) {
+            itemList.innerHTML = '<li style="color:#888; text-align:center;">No items yet. Add something!</li>';
             return;
         }
 
         // Add each item to the list
-        items.forEach(function(item, index){
-            const li=document.createElement('li');
+        items.forEach(function (item, index) {
+            const li = document.createElement('li');
 
             // Create text span
             const textSpan = document.createElement('span');
             textSpan.textContent = item.text;
 
+            // Optional: show date
+            const dateSpan = document.createElement('small');
+            dateSpan.textContent = ' (' + item.date + ')';
+            dateSpan.style.marginLeft = '6px';
+            dateSpan.style.color = '#666';
+
             // Create delete button
             const deleteBtn = document.createElement('button');
             deleteBtn.textContent = 'Delete';
             deleteBtn.className = 'delete-btn';
+            deleteBtn.style.marginLeft = '8px';
 
             // When delete button is clicked
+            deleteBtn.addEventListener('click', function () {
+                deleteItem(index);
+            });
+
             li.appendChild(textSpan);
+            li.appendChild(dateSpan);
             li.appendChild(deleteBtn);
 
             // Add list item to the list
@@ -49,12 +69,12 @@ document.addEventListener('DOMContentLoaded',function(){
     }
 
     // 4. Delete function
-    function deleteItem(index){
+    function deleteItem(index) {
         // Remove item from array
         items.splice(index, 1);
 
         // Save to localStorage
-        localStorage.setItem('myItems',JSON.stringify(items));
+        localStorage.setItem('myItems', JSON.stringify(items));
 
         // Refresh display
         displayItems();
@@ -62,12 +82,12 @@ document.addEventListener('DOMContentLoaded',function(){
     }
 
     // 5. Add new item
-    function addNewItem(){
+    function addNewItem() {
         // Get value from input
         const text = itemInput.value.trim();
 
         // Check if input is empty
-        if (text === ''){
+        if (text === '') {
             alert('Please type something first.');
             return;
         }
@@ -76,43 +96,45 @@ document.addEventListener('DOMContentLoaded',function(){
         const newItem = {
             text: text,
             date: new Date().toLocaleString(),
-            id: Date.now() //Unique ID
+            id: Date.now() // Unique ID
         };
 
         // Add to array
         items.push(newItem);
 
         // Save to localStorage
-        localStorage.setItem('myItems',JSON.stringify(items));
+        localStorage.setItem('myItems', JSON.stringify(items));
 
         // Clear input
         itemInput.value = '';
 
-        // Focus back to input (read for next item)
+        // Focus back to input (ready for next item)
         itemInput.focus();
 
         // Refresh display
         displayItems();
 
         console.log('Added:', newItem);
-    
     }
 
     // 6. Event Listeners
 
-        // When button is clicked
-        addButton.addEventListener('click', addNewItem);
+    // If the add button is inside a form, prevent the form submission from reloading the page.
+    addButton.addEventListener('click', function (e) {
+        e.preventDefault();
+        addNewItem();
+    });
 
-        // When enter key is presssed in input
-        itemInput.addEventListener('keypress',function(event){
-            if (event.key==='Enter'){
-                addNewItem();
-            }
-        });
+    // When enter key is pressed in input (use keydown and prevent default so forms don't submit)
+    itemInput.addEventListener('keydown', function (event) {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            addNewItem();
+        }
+    });
 
     // 7. Initial Display
     displayItems();
 
     console.log('App is ready! Try adding some items.');
-
 });
